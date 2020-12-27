@@ -6,107 +6,131 @@
     <!-- add icon -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet"> 
+    <script src="//unpkg.com/3d-force-graph"></script>
     <script src='./data/data.js'></script>
-    <script src="./build/sigma.min.js"></script>
-    <script src="build/plugins/sigma.layout.forceAtlas2.min.js"></script>
-    <script src="main.js"></script>
+    <script src='data/data_3d.js'></script>
+    <!-- <script src="main.js"></script> -->
 
     <style>
         #container {
-            position: absolute;
-            width: 100%;
+            width: 90%;
             height: 100%;
+        }
+
+        * {
+            font-family: 'Open Sans';
+        }
+
+        h1, p {
+            margin-left: 20%;
+            margin-right: 20%;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
+    <h1>A Universe of Courses at UC San Diego</h1>
+    <p>
+        Courses A and B are linked if A is one of the prerequisites for B, or vice versa. <br>
+        Scroll to zoom, drag to rotate, and right click and drag to pan. Hover over a node to see the course. <br>
+        You might not want to drag the nodes -- that'll make the render reposition the nodes, which'll take a while.
+    </p>
+
+    <p style="color: red;">
+        If this version of the graph isn't working for you, you can look at the 2d version <a href='flat.html'>here.</a>
+    </p>
+
+    <hr>
+
     <div id="container"></div>
     <script>
-        var s = new sigma(
-            {
-                renderer: {
-                    container: document.getElementById('container')
-                },
-                settings: {
-                    font: 'Open Sans'
-                }
-            }
-        )
-        
-        // We first need to save the original colors of our
-        // nodes and edges, like this:
-        s.graph.nodes().forEach(function(n) {
-            n.originalColor = n.color;
-        });
-        s.graph.edges().forEach(function(e) {
-            e.originalColor = e.color;
-        });
+        const elem = document.getElementById('container');
 
-        // When a node is clicked, we check for each node
-        // if it is a neighbor of the clicked one. If not,
-        // we set its color as grey, and else, it takes its
-        // original color.
-        // We do the same for the edges, and we only keep
-        // edges that have both extremities colored.
-        s.bind('clickNode', function(e) {
-            var nodeId = e.data.node.id,
-                toKeep = s.graph.neighbors(nodeId);
-            toKeep[nodeId] = e.data.node;
+        const Graph = ForceGraph3D()(elem)
+        .graphData(data_3d)
+        .nodeAutoColorBy('dept')
+        .nodeLabel(node => `${node.id}: ${node.title}`)
+        .nodeVal( node => node.size)
+        .onNodeHover(node => elem.style.cursor = node ? 'pointer' : null)
 
-            s.graph.nodes().forEach(function(n) {
-            if (toKeep[n.id])
-                n.color = n.originalColor;
-            else
-                n.color = '#eee';
-            });
-
-            s.graph.edges().forEach(function(e) {
-            if (e.source == nodeId || e.target == nodeId)
-                e.color = '#FFCD00';
-            else
-                e.color = '#eee';
-            });
-
-            // Since the data has been modified, we need to
-            // call the refresh method to make the colors
-            // update effective.
-            s.refresh();
-        });
-
-        // When the stage is clicked, we just color each
-        // node and edge with its original color.
-        s.bind('clickStage', function(e) {
-            s.graph.nodes().forEach(function(n) {
-            n.color = n.originalColor;
-            });
-
-            s.graph.edges().forEach(function(e) {
-            e.color = e.originalColor;
-            });
-
-            // Same as in the previous event:
-            s.refresh();
-        });
-
-        s.settings({
-            edgeColor: 'default',
-            defaultEdgeColor: '#DCDCDC',
-            nodeColor: 'default',
-            defaultNodeColor: '#006A96',
-            defaultLabelColor: '#000000'
-        });
-
-        // Load the graph in sigma
-        s.graph.read(data);
-        // Ask sigma to draw it
-        s.refresh();
-
-        s.startForceAtlas2({
-            scalingRatio: 8
-        })
-
-        window.setTimeout(function() {s.killForceAtlas2()}, 5000);
     </script>
+
+    <hr>
+
+    <p>
+        These courses are the most listed prerequisites.
+    </p>
+
+    <table style="margin-left: auto; margin-right: auto;">
+        <thead>
+          <tr>
+            <th>Course</th>
+            <th>Listed prerequisite for...<br></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MATH 18</td>
+            <td>65 courses</td>
+          </tr>
+          <tr>
+            <td>COMM 10</td>
+            <td>60 </td>
+          </tr>
+          <tr>
+            <td>MATH 31AH</td>
+            <td>56</td>
+          </tr>
+          <tr>
+            <td>COMM 100A</td>
+            <td>47</td>
+          </tr>
+          <tr>
+            <td>MATH 20C</td>
+            <td>36</td>
+          </tr>
+          <tr>
+            <td>PHYS 2A</td>
+            <td>35</td>
+          </tr>
+          <tr>
+            <td>MATH 20D</td>
+            <td>35</td>
+          </tr>
+          <tr>
+            <td>LTSP 50A</td>
+            <td>35</td>
+          </tr>
+          <tr>
+            <td>MATH 20A</td>
+            <td>30</td>
+          </tr>
+          <tr>
+            <td>BILD 1</td>
+            <td>29</td>
+          </tr>
+          <tr>
+            <td>CSE 11</td>
+            <td>22</td>
+          </tr>
+          <tr>
+            <td>MATH 180A</td>
+            <td>22</td>
+          </tr>
+          <tr>
+            <td>CSE 100</td>
+            <td>21</td>
+          </tr>
+          <tr>
+            <td>MATH 10A</td>
+            <td>21</td>
+          </tr>
+          <tr>
+            <td>CSE 8B</td>
+            <td>20</td>
+          </tr>
+        </tbody>
+    </table>
 </body>
 </html>
